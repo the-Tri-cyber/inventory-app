@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'manager' && $_SESSION['role'] !== 'user') {
+if (!isset($_SESSION['username']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'manager' && $_SESSION['role'] !== 'user')) {
     header("Location: ../auth/login.php");
     exit;
 }
@@ -46,19 +46,33 @@ $pdf->AddPage();
 // Ambil tanggal dari parameter GET
 $startDate = isset($_GET['start_date']) ? $_GET['start_date'] : '';
 $endDate = isset($_GET['end_date']) ? $_GET['end_date'] : '';
+$reportType = isset($_GET['report_type']) ? $_GET['report_type'] : '';
 
 // Query untuk mengambil data barang dengan filter tanggal
-$query = "SELECT b.id, b.nama_barang, b.merk, k.kategori, c.kondisi, r.ruangan, b.stok, b.harga_satuan, b.asal_perolehan, b.gambar 
-          FROM barang b 
-          JOIN kategori k ON b.id_kategori = k.id_kategori 
-          JOIN kondisi c ON b.id_kondisi = c.id_kondisi 
-          JOIN ruang r ON b.id_ruangan = r.id_ruangan
-          WHERE b.created_at BETWEEN ? AND ?";
+if ($reportType === 'created') {
+    $query = "SELECT b.id, b.nama_barang, b.merk, k.kategori, c.kondisi, r.ruangan, b.stok, b.harga_satuan, b.asal_perolehan, b.gambar 
+              FROM barang b 
+              JOIN kategori k ON b.id_kategori = k.id_kategori 
+              JOIN kondisi c ON b.id_kondisi = c.id_kondisi 
+              JOIN ruang r ON b.id_ruangan = r.id_ruangan
+              WHERE b.created_at BETWEEN ? AND ?";
+} elseif ($reportType === 'updated') {
+    $query = "SELECT b.id, b.nama_barang, b.merk, k.kategori, c.kondisi, r.ruangan, b.stok, b.harga_satuan, b.asal_perolehan, b.gambar 
+              FROM barang b 
+              JOIN kategori k ON b.id_kategori = k.id_kategori 
+              JOIN kondisi c ON b.id_kondisi = c.id_kondisi 
+              JOIN ruang r ON b.id_ruangan = r.id_ruangan
+              WHERE b.updated_at BETWEEN ? AND ?";
+} else {
+    // Jika report_type tidak valid, redirect atau tampilkan pesan error
+    echo "Invalid report type.";
+    exit;
+}
+
 $stmt = $conn->prepare($query);
 $stmt->bind_param("ss", $startDate, $endDate);
 $stmt->execute();
 $result = $stmt->get_result();
-
 
 // Buat tabel untuk laporan
 $html = '<h2>Laporan Barang</h2>';
@@ -111,6 +125,6 @@ $html .= '</tbody></table>';
 // Output the HTML content
 $pdf->writeHTML($html, true, false, true, false, '');
 
-// // Close and output PDF document
+// Close and output PDF document
 $pdf->Output('laporan_barang.pdf', 'I'); // 'I' untuk menampilkan di browser, 'D' untuk download
 ?>

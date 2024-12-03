@@ -1,3 +1,34 @@
+# Inventory App
+
+Inventory App adalah aplikasi manajemen inventaris yang memungkinkan pengguna untuk mengelola barang, kategori, kondisi, dan transaksi dengan mudah. Aplikasi ini dibangun menggunakan PHP dan MySQL.
+
+## Syarat Penggunaan
+
+Sebelum memulai, pastikan Anda memiliki perangkat lunak berikut terinstal:
+
+- **Node.js** v22.11.0
+- **PHP** v8.2.12
+- **Composer** v2.8.3
+
+## Langkah-Langkah Penggunaan
+
+Ikuti langkah-langkah berikut untuk mengatur dan menjalankan aplikasi:
+
+1. Clone repository ini menggunakan perintah berikut:
+2. `git clone https://github.com/the-tri-cyber/inventory-app.git`
+3. Buka folder repository yang telah di clone menggunakan perintah berikut:
+4. `cd inventory-app`
+5. Install tcpdf library menggunakan perintah berikut:
+6. `composer require tecnickcom/tcpdf`
+7. jalankan mysql dan apache server
+8. buat database baru dengan nama inventory
+9. import database inventory.sql ke dalam database inventory
+10. jalankan aplikasi menggunakan perintah berikut:
+11. `localhost/inventory-app/`
+12. login menggunakan email dan password dibawah.
+
+note: jangan ubah nama folder `inventory-app` karena akan menyebabkan aplikasi tidak dapat berjalan dengan benar. Jika ingin mengubah nama folder, pastikan untuk mengubah nama folder di dalam file `config.php` dan mengubah nama folder di dalam file `index.php` juga. serta path yang berkaitan dengan nama folder tersebut.
+
 # Pembagian Akses Berdasarkan Role
 
 ## 1. Admin

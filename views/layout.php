@@ -52,16 +52,15 @@
     <!-- layout end -->
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
     <?php
     // Menentukan path untuk file JavaScript berdasarkan kondisi
     if (strpos($_SERVER['REQUEST_URI'], '/account/') !== false) {
         // Jika berada di dalam folder 'account', hilangkan '/inventory-app'
-        echo '<script src="bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>';
+        echo '<script src="bootstrap.bundle.min.js" crossorigin="anonymous"></script>';
         echo '<script src="public/assets/js/script.js"></script>';
     } else {
         // Jika tidak, tetap menggunakan path lengkap
-        echo '<script src="/inventory-app/bootstrap-5.3.3/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>';
+        echo '<script src="/inventory-app/bootstrap-5.3.3/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>';
         echo '<script src="/inventory-app/public/assets/js/script.js"></script>';
     }
     ?>

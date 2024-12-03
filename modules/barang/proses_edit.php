@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'manager') {
+if (!isset($_SESSION['username']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'manager')) {
     header("Location: ../auth/login.php");
     exit;
 }
@@ -58,11 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Hapus gambar lama jika ada
-    if ($oldImagePath && file_exists($uploadFileDir . $oldImagePath)) {
-        unlink($uploadFileDir . $oldImagePath); // Menghapus file gambar lama
-    }
-
     // Siapkan query untuk update barang
     if ($gambar) {
         // Jika gambar baru diupload, update gambar di database
@@ -76,6 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Eksekusi query
     if ($query->execute()) {
+        // Hapus gambar lama jika ada dan gambar baru berhasil diupload
+        if ($gambar && $oldImagePath && file_exists($uploadFileDir . $oldImagePath)) {
+            unlink($uploadFileDir . $oldImagePath); // Menghapus file gambar lama
+        }
         header("Location: index.php");
         exit;
     } else {

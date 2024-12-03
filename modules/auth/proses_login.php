@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 // Redirect berdasarkan peran pengguna
                 if ($user['role'] === 'admin' || $user['role'] === 'manager') {
-                    header("Location: ../../public/index.php"); // Halaman untuk admin dan manager
+                    header("Location: ../../index.php"); // Halaman untuk admin dan manager
                 } else {
                     header("Location: ../../modules/dashboard.php"); // Halaman untuk pengguna biasa
                 }

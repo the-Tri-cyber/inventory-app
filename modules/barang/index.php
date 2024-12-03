@@ -27,11 +27,16 @@ if (isset($_GET['reset'])) {
 
 // Fungsi untuk mendapatkan daftar barang dengan pagination
 function getBarang($conn, $search = '', $offset = 0, $limit = 10) {
-    $query = "SELECT * FROM barang WHERE 
-              nama_barang LIKE ? OR 
-              merk LIKE ? OR 
-              asal_perolehan LIKE ? 
-              ORDER BY created_at DESC LIMIT ?, ?";
+    $query = "SELECT b.*, k.kategori, c.kondisi, r.ruangan 
+              FROM barang b
+              LEFT JOIN kategori k ON b.id_kategori = k.id_kategori
+              LEFT JOIN kondisi c ON b.id_kondisi = c.id_kondisi
+              LEFT JOIN ruang r ON b.id_ruangan = r.id_ruangan
+              WHERE 
+              b.nama_barang LIKE ? OR 
+              b.merk LIKE ? OR 
+              b.asal_perolehan LIKE ? 
+              ORDER BY b.created_at DESC LIMIT ?, ?";
     $stmt = $conn->prepare($query);
     $searchParam = "%$search%";
     $stmt->bind_param("ssiii", $searchParam, $searchParam, $searchParam, $offset, $limit);
@@ -80,10 +85,10 @@ function createTableContent($result) {
             <td>' . $no++ . '</td>
             <td>' . $row['id'] . '</td>
             <td>' . htmlspecialchars($row['nama_barang']) . '</td>
-            <td>' . htmlspecialchars($row['merk']) . '</td>
-            <td>' . htmlspecialchars($row['id_kategori']) . '</td>
-            <td>' . htmlspecialchars($row['id_kondisi']) . '</td>
-            <td>' . htmlspecialchars($row['id_ruangan']) . '</td>
+            <td>' . htmlspecialchars($row ['merk']) . '</td>
+            <td>' . htmlspecialchars($row['kategori']) . '</td>
+            <td>' . htmlspecialchars($row['kondisi']) . '</td>
+            <td>' . htmlspecialchars($row['ruangan']) . '</td>
             <td>' . $row['stok'] . '</td>
             <td>' . number_format($row['harga_satuan'], 2, ',', '.') . '</td>
             <td>' . htmlspecialchars($row['asal_perolehan']) . '</td>
@@ -118,46 +123,80 @@ $content = '
     </form>
 ';
 
-// Menambahkan tombol Laporan hanya untuk admin 
+// Menambahkan dropdown laporan hanya untuk admin 
 if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSION['role'] === 'user') {
-    // Menambahkan tombol untuk membuka modal
-$content .= '
-<div class="mb-3">
-    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#dateModal">
-        <i class="bi bi-floppy me-2"></i>Laporan Barang
-    </button>
-</div>
-</div>';
+    $content .= '
+    <div class="mb-3">
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-floppy me-2"></i>Laporan Barang
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#createdDateModal">Tanggal Dibuat</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#updatedDateModal">Tanggal Diupdate</a></li>
+            </ul>
+        </div>
+    </div>
+    </div>';
 }
 
-// Modal untuk memilih tanggal
+// Modal untuk memilih tanggal dibuat
 $content .= '
-    <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="dateModalLabel">Pilih Tanggal untuk Laporan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="GET" action="../laporan/laporan_barang.php" target="_blank">
-                        <div class="mb-3">
-                            <label for="start_date" class="form-label">Dari Tanggal:</label>
-                            <input type="date" name="start_date" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="end_date" class="form-label">Sampai Tanggal:</label>
-                            <input type="date" name="end_date" class="form-control" required>
-                        </div>
-                        <input type="hidden" name="search" value="' . htmlspecialchars($search) . '">
-                        <button type="submit" class="btn btn-primary">Buat Laporan</button>
-                    </form>
-                </div>
+<div class="modal fade" id="createdDateModal" tabindex="-1" aria-labelledby="createdDateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createdDateModalLabel">Pilih Tanggal untuk Laporan Berdasarkan Tanggal Dibuat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="GET" action="../laporan/laporan_barang.php" target="_blank">
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Dari Tanggal:</label>
+                        <input type="date" name="start_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="end_date" class="form-label">Sampai Tanggal:</label>
+                        <input type="date" name="end_date" class="form-control" required>
+                    </div>
+                    <input type="hidden" name="search" value="' . htmlspecialchars($search) . '">
+                    <input type="hidden" name="report_type" value="created">
+                    <button type="submit" class="btn btn-primary">Buat Laporan</button>
+                </form>
             </div>
         </div>
-    </div>';
- 
-$content .='
+    </div>
+</div>';
+
+// Modal untuk memilih tanggal diupdate
+$content .= '
+<div class="modal fade" id="updatedDateModal" tabindex="-1" aria-labelledby="updatedDateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updatedDateModalLabel">Pilih Tanggal untuk Laporan Berdasarkan Tanggal Diupdate</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="GET" action="../laporan/laporan_barang.php" target="_blank">
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Dari Tanggal:</label>
+                        <input type="date" name="start_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="end_date" class="form-label">Sampai Tanggal:</label>
+                        <input type="date" name="end_date" class="form-control" required>
+                    </div>
+                    <input type="hidden" name="search" value="' . htmlspecialchars($search) . '">
+                    <input type="hidden" name="report_type" value="updated">
+                    <button type="submit" class="btn btn-primary">Buat Laporan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>';
+
+$content .= '
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
@@ -166,9 +205,9 @@ $content .='
                     <th>ID</th>
                     <th>Nama Barang</th>
                     <th>Merk</th>
-                    <th>ID Kategori</th>
-                    <th>ID Kondisi</th>
-                    <th>ID Ruang</th>
+                    <th>Kategori</th>
+                    <th>Kondisi</th>
+                    <th>Ruang</th>
                     <th>Stok</th>
                     <th>Harga Satuan</th>
                     <th>Asal Perolehan</th>
@@ -206,7 +245,7 @@ if ($page > 1) {
 }
 for ($i = 1; $i <= $totalPages; $i++) {
     $active = ($i == $page) ? 'active' : '';
-    $content .= '<li class="page-item ' . $active . '"><a class="page-link" href="?page=' . $i . '&limit=' . $limit . '&search=' . urlencode($search) . '">' . $i . '</a></ li>';
+    $content .= '<li class="page-item ' . $active . '"><a class="page-link" href="?page=' . $i . '&limit=' . $limit . '&search=' . urlencode($search) . '">' . $i . '</a></li>';
 }
 if ($page < $totalPages) {
     $content .= '<li class="page-item"><a class="page-link" href="?page=' . ($page + 1) . '&limit=' . $limit . '&search=' . urlencode($search) . '">Next</a></li>';
