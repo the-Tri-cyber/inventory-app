@@ -49,6 +49,21 @@ $query = "SELECT t.id, b.nama_barang, t.jenis, t.jumlah, t.tanggal
           JOIN barang b ON t.id_barang = b.id";
 $result = $conn->query($query);
 
+// Ambil tanggal dari parameter GET
+$startDate = isset($_GET['start_date']) ? $_GET['start_date'] : '';
+$endDate = isset($_GET['end_date']) ? $_GET['end_date'] : '';
+
+// Query untuk mengambil data barang dengan filter tanggal
+$query = "SELECT t.id, b.nama_barang, t.jenis, t.jumlah, t.tanggal 
+          FROM transaksi t 
+          JOIN barang b ON t.id_barang = b.id
+          WHERE t.tanggal BETWEEN ? AND ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("ss", $startDate, $endDate);
+$stmt->execute();
+$result = $stmt->get_result();
+
+
 // Buat tabel untuk laporan
 $html = '<h2>Laporan Transaksi</h2>';
 $html .= '<table border="1" cellpadding="5">

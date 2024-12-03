@@ -88,8 +88,8 @@ function createTableContent($result) {
             <td>' . number_format($row['harga_satuan'], 2, ',', '.') . '</td>
             <td>' . htmlspecialchars($row['asal_perolehan']) . '</td>
             <td><img src="/inventory-app/modules/uploads/' . htmlspecialchars($row['gambar']) . '" alt="Gambar" style="width: 50px; height: auto;"></td>
-            <td>' . date('d-m-Y', strtotime($row['created_at'])) . '</td>
-            <td>' . date('d-m-Y', strtotime($row['updated_at'])) . '</td>';
+            <td>' . date('d-m-Y H:i:s', strtotime($row['created_at'])) . '</td>
+            <td>' . date('d-m-Y H:i:s', strtotime($row['updated_at'])) . '</td>';
 
         // Tampilkan kolom aksi hanya untuk Admin dan Manajer
         if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager') {
@@ -120,9 +120,42 @@ $content = '
 
 // Menambahkan tombol Laporan hanya untuk admin 
 if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSION['role'] === 'user') {
-    $content .= '<a target="_blank" href="../laporan/laporan_barang.php" class="btn btn-secondary mb-3 ms-2"><i class="bi bi-floppy me-2"></i>Laporan Barang</a>
-    </div>';
+    // Menambahkan tombol untuk membuka modal
+$content .= '
+<div class="mb-3">
+    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#dateModal">
+        <i class="bi bi-floppy me-2"></i>Laporan Barang
+    </button>
+</div>
+</div>';
 }
+
+// Modal untuk memilih tanggal
+$content .= '
+    <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dateModalLabel">Pilih Tanggal untuk Laporan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="GET" action="../laporan/laporan_barang.php" target="_blank">
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Dari Tanggal:</label>
+                            <input type="date" name="start_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">Sampai Tanggal:</label>
+                            <input type="date" name="end_date" class="form-control" required>
+                        </div>
+                        <input type="hidden" name="search" value="' . htmlspecialchars($search) . '">
+                        <button type="submit" class="btn btn-primary">Buat Laporan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>';
  
 $content .='
     <div class="table-responsive">

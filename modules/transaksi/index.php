@@ -88,9 +88,40 @@ $content = '
 
 // Menambahkan tombol Laporan hanya untuk admin 
 if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSION['role'] === 'user') {
-    $content .= '<a target="_blank" href="../laporan/laporan_transaksi.php" class="btn btn-secondary mb-3 ms-2"><i class="bi bi-floppy me-2"></i>Laporan Transaksi</a>
-    </div>';
+    $content .= '<div class="mb-3">
+    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#dateModal">
+        <i class="bi bi-floppy me-2"></i>Laporan Transaksi
+    </button>
+</div>
+</div>';
 }
+
+// Modal untuk memilih tanggal
+$content .= '
+    <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dateModalLabel">Pilih Tanggal untuk Laporan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="GET" action="../laporan/laporan_transaksi.php" target="_blank">
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Dari Tanggal:</label>
+                            <input type="date" name="start_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">Sampai Tanggal:</label>
+                            <input type="date" name="end_date" class="form-control" required>
+                        </div>
+                        <input type="hidden" name="search" value="' . htmlspecialchars($search) . '">
+                        <button type="submit" class="btn btn-primary">Buat Laporan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>';
 
 $content .= '
     <div class="table-responsive">
@@ -117,7 +148,7 @@ $content .= '
                     <td>' . htmlspecialchars($row['nama_barang']) . '</td>
                     <td>' . htmlspecialchars($row['jenis']) . '</td>
                     <td>' . $row['jumlah'] . '</td>
-                    <td>' . $row['tanggal'] . '</td>';
+                    <td>' . date('d-m-Y H:i:s', strtotime($row['tanggal'])) . '</td>';
                     
                 // Tampilkan kolom aksi hanya untuk Admin dan Manajer
                 if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager') {

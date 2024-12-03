@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $fileExtension = strtolower(end($fileNameCmps));
 
         // Validasi ekstensi file
-        $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
+        $allowedfileExtensions = array('jpg', 'png', 'jpeg');
         if (in_array($fileExtension, $allowedfileExtensions)) {
             // Buat nama file baru dengan hash
             $newFileName = md5(time() . $fileName) . '.' . $fileExtension;

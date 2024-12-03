@@ -43,13 +43,22 @@ $pdf->SetFont('helvetica', '', 12);
 // Add a page
 $pdf->AddPage();
 
-// Query untuk mengambil data barang
+// Ambil tanggal dari parameter GET
+$startDate = isset($_GET['start_date']) ? $_GET['start_date'] : '';
+$endDate = isset($_GET['end_date']) ? $_GET['end_date'] : '';
+
+// Query untuk mengambil data barang dengan filter tanggal
 $query = "SELECT b.id, b.nama_barang, b.merk, k.kategori, c.kondisi, r.ruangan, b.stok, b.harga_satuan, b.asal_perolehan, b.gambar 
           FROM barang b 
           JOIN kategori k ON b.id_kategori = k.id_kategori 
           JOIN kondisi c ON b.id_kondisi = c.id_kondisi 
-          JOIN ruang r ON b.id_ruangan = r.id_ruangan";
-$result = $conn->query($query);
+          JOIN ruang r ON b.id_ruangan = r.id_ruangan
+          WHERE b.created_at BETWEEN ? AND ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("ss", $startDate, $endDate);
+$stmt->execute();
+$result = $stmt->get_result();
+
 
 // Buat tabel untuk laporan
 $html = '<h2>Laporan Barang</h2>';
