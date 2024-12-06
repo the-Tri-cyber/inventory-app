@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 28, 2024 at 04:03 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Waktu pembuatan: 06 Des 2024 pada 10.09
+-- Versi server: 10.4.32-MariaDB
+-- Versi PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `barang`
+-- Struktur dari tabel `barang`
 --
 
 CREATE TABLE `barang` (
@@ -43,21 +43,21 @@ CREATE TABLE `barang` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `barang`
+-- Dumping data untuk tabel `barang`
 --
 
 INSERT INTO `barang` (`id`, `nama_barang`, `merk`, `id_kategori`, `id_kondisi`, `id_ruangan`, `stok`, `harga_satuan`, `asal_perolehan`, `gambar`, `created_at`, `updated_at`) VALUES
-(5, 'mouse', 'r-one', 1, 2, 1, 40, 180000.00, 'pt indobismar', '4ac31b746dd9b2481276d453f4ec5864.jpg', '2024-11-21 10:42:31', '2024-11-24 11:37:16'),
+(5, 'mouse', 'r-one', 1, 2, 1, 40, 180000.00, 'pt indobismar', 'd764e59c2d09fbdba950d1b18e603715.jpg', '2024-11-21 10:42:31', '2024-12-06 09:05:20'),
 (6, 'wifi adapter', 'd-link', 1, 1, 1, 100, 100000.00, 'pt indobismar', '83f63a6587445cf1d35b310fb823ff01.jpg', '2024-11-21 10:43:08', '2024-11-24 13:08:10'),
 (7, 'handphone', 'iphone 14 pro max', 1, 1, 2, 28, 2000000.00, 'pt indobismar', '948b81b5432b70d32b8ff6efa7b6aed7.jpg', '2024-11-22 10:02:32', '2024-11-24 13:08:35'),
 (8, 'kipas angin', 'nova', 1, 1, 3, 12, 200000.00, 'instansi komdigi', 'a3112ee5dfc615f840f62a5a09d2003c.jpg', '2024-11-23 13:11:50', '2024-11-24 13:10:29'),
 (9, 'obeng', 'visipro', 4, 4, 3, 11, 200000.00, 'axioo', '93a2673d9b87912c3bdcc86d8f57d6c0.jpg', '2024-11-24 02:36:59', '2024-11-25 03:20:22'),
-(14, 'bola basket', 'molten', 2, 2, 2, 10, 300000.00, 'instansi komdigi', '64a4f0d6854903160642858a69d8cd55.jpg', '2024-11-24 13:56:09', '2024-11-24 13:56:09');
+(14, 'bola basket', 'molten', 2, 2, 2, 10, 300000.00, 'instansi komdigi', '218b0b47854d1103b20012903efcc7d1.jpg', '2024-11-24 13:56:09', '2024-12-06 09:05:40');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `kategori`
+-- Struktur dari tabel `kategori`
 --
 
 CREATE TABLE `kategori` (
@@ -66,7 +66,7 @@ CREATE TABLE `kategori` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `kategori`
+-- Dumping data untuk tabel `kategori`
 --
 
 INSERT INTO `kategori` (`id_kategori`, `kategori`) VALUES
@@ -77,7 +77,7 @@ INSERT INTO `kategori` (`id_kategori`, `kategori`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `kondisi`
+-- Struktur dari tabel `kondisi`
 --
 
 CREATE TABLE `kondisi` (
@@ -86,7 +86,7 @@ CREATE TABLE `kondisi` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `kondisi`
+-- Dumping data untuk tabel `kondisi`
 --
 
 INSERT INTO `kondisi` (`id_kondisi`, `kondisi`) VALUES
@@ -97,7 +97,7 @@ INSERT INTO `kondisi` (`id_kondisi`, `kondisi`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ruang`
+-- Struktur dari tabel `ruang`
 --
 
 CREATE TABLE `ruang` (
@@ -106,7 +106,7 @@ CREATE TABLE `ruang` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `ruang`
+-- Dumping data untuk tabel `ruang`
 --
 
 INSERT INTO `ruang` (`id_ruangan`, `ruangan`) VALUES
@@ -117,7 +117,7 @@ INSERT INTO `ruang` (`id_ruangan`, `ruangan`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `transaksi`
+-- Struktur dari tabel `transaksi`
 --
 
 CREATE TABLE `transaksi` (
@@ -129,7 +129,7 @@ CREATE TABLE `transaksi` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `transaksi`
+-- Dumping data untuk tabel `transaksi`
 --
 
 INSERT INTO `transaksi` (`id`, `id_barang`, `jenis`, `jumlah`, `tanggal`) VALUES
@@ -141,7 +141,7 @@ INSERT INTO `transaksi` (`id`, `id_barang`, `jenis`, `jumlah`, `tanggal`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Struktur dari tabel `users`
 --
 
 CREATE TABLE `users` (
@@ -154,7 +154,7 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `users`
+-- Dumping data untuk tabel `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `gambar`) VALUES
@@ -167,89 +167,89 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `gambar`) VA
 --
 
 --
--- Indexes for table `barang`
+-- Indeks untuk tabel `barang`
 --
 ALTER TABLE `barang`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `kategori`
+-- Indeks untuk tabel `kategori`
 --
 ALTER TABLE `kategori`
   ADD PRIMARY KEY (`id_kategori`);
 
 --
--- Indexes for table `kondisi`
+-- Indeks untuk tabel `kondisi`
 --
 ALTER TABLE `kondisi`
   ADD PRIMARY KEY (`id_kondisi`);
 
 --
--- Indexes for table `ruang`
+-- Indeks untuk tabel `ruang`
 --
 ALTER TABLE `ruang`
   ADD PRIMARY KEY (`id_ruangan`);
 
 --
--- Indexes for table `transaksi`
+-- Indeks untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_barang` (`id_barang`);
 
 --
--- Indexes for table `users`
+-- Indeks untuk tabel `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `unique_email` (`email`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT untuk tabel yang dibuang
 --
 
 --
--- AUTO_INCREMENT for table `barang`
+-- AUTO_INCREMENT untuk tabel `barang`
 --
 ALTER TABLE `barang`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
--- AUTO_INCREMENT for table `kategori`
+-- AUTO_INCREMENT untuk tabel `kategori`
 --
 ALTER TABLE `kategori`
   MODIFY `id_kategori` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `kondisi`
+-- AUTO_INCREMENT untuk tabel `kondisi`
 --
 ALTER TABLE `kondisi`
   MODIFY `id_kondisi` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `ruang`
+-- AUTO_INCREMENT untuk tabel `ruang`
 --
 ALTER TABLE `ruang`
   MODIFY `id_ruangan` int(15) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `transaksi`
+-- AUTO_INCREMENT untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT untuk tabel `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- Constraints for dumped tables
+-- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
 --
 
 --
--- Constraints for table `transaksi`
+-- Ketidakleluasaan untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
   ADD CONSTRAINT `transaksi_ibfk_1` FOREIGN KEY (`id_barang`) REFERENCES `barang` (`id`) ON DELETE CASCADE;
