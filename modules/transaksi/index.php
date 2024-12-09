@@ -125,7 +125,7 @@ while ($row = $result->fetch_assoc()) {
             <td>' . $row['jumlah'] . '</td>
             <td>' . htmlspecialchars($row['kondisi']) . '</td>
             <td>' . htmlspecialchars($row['nomer_surat_jalan']) . '</td>
-            <td>' . date('d-m-Y', strtotime($row['tanggal'])) . '</td>';
+            <td>' . date('d-m-Y H:i:s', strtotime($row['tanggal'])) . '</td>';
             
             // Tampilkan kolom aksi hanya untuk Admin dan Manajer 
         if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager') {

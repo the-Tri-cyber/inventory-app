@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2024 at 06:49 AM
+-- Generation Time: Dec 09, 2024 at 07:25 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,7 +44,7 @@ CREATE TABLE `barang` (
 --
 
 INSERT INTO `barang` (`id`, `nama_barang`, `merk`, `id_kategori`, `id_ruangan`, `stok`, `asal_perolehan`, `created_at`, `updated_at`) VALUES
-(5, 'mouse', 'r-one', 1, 1, 0, 'pt indobismar', '2024-11-21 10:42:31', '2024-12-08 16:28:22'),
+(5, 'mouse', 'r-one', 1, 1, 0, 'pt indobismar', '2024-11-21 10:42:31', '2024-12-09 06:13:56'),
 (6, 'wifi adapter', 'd-link', 1, 1, 20, 'pt indobismar', '2024-11-21 10:43:08', '2024-12-08 13:00:51'),
 (7, 'handphone', 'iphone 14 pro max', 1, 2, 20, 'pt indobismar', '2024-11-22 10:02:32', '2024-12-08 13:00:42'),
 (8, 'kipas angin', 'nova', 1, 3, 20, 'instansi komdigi', '2024-11-23 13:11:50', '2024-12-08 13:00:35'),
@@ -134,7 +134,9 @@ CREATE TABLE `transaksi` (
 
 INSERT INTO `transaksi` (`id`, `id_barang`, `jenis`, `jumlah`, `id_kondisi`, `nomer_surat_jalan`, `tanggal`) VALUES
 (7, 5, 'keluar', 5, 1, 'miso1983829923', '2024-12-08 13:12:00'),
-(8, 5, 'keluar', 15, 2, 'iosn320985829050', '2024-12-08 13:42:00');
+(8, 5, 'keluar', 15, 2, 'iosn320985829050', '2024-12-08 13:42:00'),
+(13, 5, 'masuk', 5, 1, 'iosn2032099433435', '2024-12-09 06:13:00'),
+(14, 5, 'keluar', 5, 2, 'iosn2032099433435', '2024-12-09 06:14:00');
 
 -- --------------------------------------------------------
 
@@ -234,7 +236,7 @@ ALTER TABLE `ruang`
 -- AUTO_INCREMENT for table `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `users`
