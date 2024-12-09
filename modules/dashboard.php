@@ -4,53 +4,85 @@ session_start();
 
 // Periksa apakah pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
-    header("Location: auth/login.php");
+    header("Location: modules/auth/login.php");
     exit();
 }
 
 include '../config/db.php';
 
-// Query untuk menghitung total barang dan total transaksi
-$totalQuery = "
-    SELECT 
-        (SELECT COUNT(*) FROM barang) as total_barang, 
-        (SELECT COUNT(*) FROM transaksi) as total_transaksi
+// Query untuk menghitung total barang
+$totalBarangQuery = "SELECT COUNT(*) as total_barang FROM barang";
+$totalBarangResult = $conn->query($totalBarangQuery);
+$totalBarangRow = $totalBarangResult->fetch_assoc();
+$totalBarang = $totalBarangRow['total_barang'];
+
+// Query untuk menghitung barang yang tersedia (stok > 0)
+$barangTersediaQuery = "SELECT COUNT(*) as barang_tersedia FROM barang WHERE stok > 0";
+$barangTersediaResult = $conn->query($barangTersediaQuery);
+$barangTersediaRow = $barangTersediaResult->fetch_assoc();
+$barangTersedia = $barangTersediaRow['barang_tersedia'];
+
+// Query untuk menghitung total transaksi harian
+$totalTransaksiHarianQuery = "
+    SELECT COUNT(*) as total_transaksi_harian 
+    FROM transaksi 
+    WHERE DATE(tanggal) = CURDATE()
 ";
-$totalResult = $conn->query($totalQuery);
-$totalRow = $totalResult->fetch_assoc();
-$totalBarang = $totalRow['total_barang'];
-$totalTransaksi = $totalRow['total_transaksi'];
+$totalTransaksiHarianResult = $conn->query($totalTransaksiHarianQuery);
+$totalTransaksiHarianRow = $totalTransaksiHarianResult->fetch_assoc();
+$totalTransaksiHarian = $totalTransaksiHarianRow['total_transaksi_harian'];
+
+// Query untuk menghitung total transaksi bulanan
+$totalTransaksiBulananQuery = "
+    SELECT COUNT(*) as total_transaksi_bulanan 
+    FROM transaksi 
+    WHERE MONTH(tanggal) = MONTH(CURDATE()) 
+      AND YEAR(tanggal) = YEAR(CURDATE())
+";
+$totalTransaksiBulananResult = $conn->query($totalTransaksiBulananQuery);
+$totalTransaksiBulananRow = $totalTransaksiBulananResult->fetch_assoc();
+$totalTransaksiBulanan = $totalTransaksiBulananRow['total_transaksi_bulanan'];
 
 // Tentukan konten utama (dynamic content)
 ob_start(); // Mulai output buffering
 ?>
 <div class="container">
     <h1 class="mb-4">Dashboard</h1>
-    <p>Selamat datang, <?php echo htmlspecialchars($_SESSION['username']); ?>! Anda dapat melihat barang dan transaksi dari sini.</p>
+    <p>Selamat datang, <?php echo htmlspecialchars($_SESSION['username']); ?>! Anda dapat mengelola item, transaksi, dan laporan dari sini.</p>
     
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <a href="/inventory-app/modules/barang" class="card text-white bg-primary mb-4">
-                <div class="card-header">Total Barang</div>
+                <div class="card-header">Total Item</div>
                 <div class="card-body">
-                    <h5 class="card-title"><?php echo $totalBarang; ?></h5>
-                    <p class="card-text">Jumlah total barang yang tersedia.</p>
+                    <h5 class="card-title"><?php echo $barangTersedia . " / " . $totalBarang; ?></h5>
+                    <p class="card-text">Jumlah barang tersedia dibandingkan dengan total barang.</p>
                 </div>
             </a>
         </div>
         
-        <div class="col-md-6">
+        <div class="col-md-4">
             <a href="/inventory-app/modules/transaksi" class="card text-white bg-success mb-4">
-                <div class="card-header">Total Transaksi</div>
+                <div class="card-header">Total Transaksi Harian</div>
                 <div class="card-body">
-                    <h5 class="card-title"><?php echo $totalTransaksi; ?></h5>
-                    <p class="card-text">Jumlah total transaksi yang telah dilakukan.</p>
+                    <h5 class="card-title"><?php echo $totalTransaksiHarian; ?></h5>
+                    <p class="card-text">Jumlah total transaksi harian yang telah dilakukan.</p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-4">
+            <a href="/inventory-app/modules/transaksi" class="card text-white bg-warning mb-4">
+                <div class="card-header">Total Transaksi Bulanan</div>
+                <div class="card-body">
+                    <h5 class="card-title"><?php echo $totalTransaksiBulanan; ?></h5>
+                    <p class="card-text">Jumlah total transaksi bulanan yang telah dilakukan.</p>
                 </div>
             </a>
         </div>
     </div>
 
-    <h3 class="mt-5">Transaksi</h3>
+    <h3 class="mt-5">Transaksi Terbaru</h3>
     <table class="table table-striped table-bordered mt-3">
         <thead class="table-dark">
             <tr>
@@ -61,7 +93,7 @@ ob_start(); // Mulai output buffering
                 <th>Jumlah</th>
                 <th>Tanggal</th>
                 <?php if ($_SESSION['role'] === 'admin'): ?>
-                    <th>Aksi</th> <!-- Tambahkan kolom aksi untuk admin -->
+                    <th>Aksi</th>
                 <?php endif; ?>
             </tr>
         </thead>
@@ -80,7 +112,7 @@ ob_start(); // Mulai output buffering
                 $no = 1; // Inisialisasi nomor urut
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>
-                        <td>{$no}</td> <!-- Tampilkan nomor urut -->
+                        <td>{$no}</td>
                         <td>{$row['id']}</td>
                         <td>{$row['nama_barang']}</td>
                         <td>{$row['jenis']}</td>
@@ -93,10 +125,10 @@ ob_start(); // Mulai output buffering
                         </td>";
                     }
                     echo "</tr>";
-                    $no++; // Increment nomor urut
+                    $no++;
                 }
             } else {
-                echo "<tr><td colspan='6' class='text-center'>Tidak ada transaksi.</td></tr>";
+                echo "<tr><td colspan='7' class='text-center'>Tidak ada transaksi terbaru.</td></tr>";
             }
             ?>
         </tbody>
@@ -104,7 +136,7 @@ ob_start(); // Mulai output buffering
 </div>
 <?php
 $content = ob_get_clean(); // Simpan konten dynamic ke variabel
-$title = "Dashboard Pengguna"; // Atur judul halaman
+$title = "Dashboard"; // Atur judul halaman
 
 // Gunakan layout utama
 include '../views/layout.php';

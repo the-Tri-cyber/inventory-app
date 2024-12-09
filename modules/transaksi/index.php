@@ -125,12 +125,19 @@ while ($row = $result->fetch_assoc()) {
             <td>' . $row['jumlah'] . '</td>
             <td>' . htmlspecialchars($row['kondisi']) . '</td>
             <td>' . htmlspecialchars($row['nomer_surat_jalan']) . '</td>
-            <td>' . date('d-m-Y', strtotime($row['tanggal'])) . '</td>
-            <td>
+            <td>' . date('d-m-Y', strtotime($row['tanggal'])) . '</td>';
+            
+            // Tampilkan kolom aksi hanya untuk Admin dan Manajer 
+        if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager') {
+            $content .= '<td>
                 <a href="edit.php?id=' . $row['id'] . '" class="btn btn-warning btn-sm">Edit</a>
                 <a href="hapus.php?id=' . $row['id'] . '" class="btn btn-danger btn-sm">Hapus</a>
-            </td>
-        </tr>';
+            </td>';
+        } else {
+            $content .= '<td></td>'; // Kosongkan kolom aksi untuk pengguna lain
+        }
+
+        $content .= '</tr>';
 }
 
 $content .= '

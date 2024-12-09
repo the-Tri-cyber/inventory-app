@@ -71,7 +71,6 @@ ob_start(); // Mulai output buffering
             </a>
         </div>
         
-        <?php if ($_SESSION['role'] === 'admin'): ?>
         <div class="col-md-4">
             <a href="/inventory-app/modules/transaksi" class="card text-white bg-warning mb-4">
                 <div class="card-header">Total Transaksi Bulanan</div>
@@ -81,7 +80,6 @@ ob_start(); // Mulai output buffering
                 </div>
             </a>
         </div>
-        <?php endif; ?>
     </div>
 
     <h3 class="mt-5">Transaksi Terbaru</h3>
