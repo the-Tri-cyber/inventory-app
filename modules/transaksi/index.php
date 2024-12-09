@@ -1,25 +1,27 @@
 <?php
 session_start();
+
+// Periksa autentikasi dan otorisasi
 if (!isset($_SESSION['username'])) {
     header("Location: ../auth/login.php");
     exit;
 }
 
-if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'manager' && $_SESSION['role'] !== 'user') {
-    header("Location: /inventory-app/public/"); // Ganti dengan URL halaman yang diinginkan
+if (!in_array($_SESSION['role'], ['admin', 'manager', 'user'])) {
+    header("Location: /inventory-app/public/");
     exit();
 }
 
 include '../../config/db.php';
 
 // Pagination settings
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10; // Jumlah transaksi per halaman
+$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
 // Handle reset
 if (isset($_GET['reset'])) {
-    unset($_SESSION['search']); // Menghapus nilai pencarian dari session
+    unset($_SESSION['search']);
     header("Location: " . $_SERVER['PHP_SELF'] . "?page=1&limit=$limit");
     exit;
 }
@@ -27,12 +29,13 @@ if (isset($_GET['reset'])) {
 // Fungsi untuk mendapatkan daftar transaksi dengan pagination
 function getTransaksi($conn, $search = '', $offset = 0, $limit = 10) {
     $query = "
-        SELECT t.id, b.nama_barang, t.jenis, t.jumlah, t.tanggal
+        SELECT t.id, b.nama_barang, t.jenis, t.jumlah, k.kondisi, t.nomer_surat_jalan, t.tanggal
         FROM transaksi t
         JOIN barang b ON t.id_barang = b.id
+        JOIN kondisi k ON t.id_kondisi = k.id_kondisi
         WHERE b.nama_barang LIKE ? OR t.jenis LIKE ?
-        ORDER BY t.tanggal DESC LIMIT ?, ?
-    ";
+        ORDER BY t.tanggal DESC
+        LIMIT ?, ?";
     $stmt = $conn->prepare($query);
     $searchParam = "%$search%";
     $stmt->bind_param("ssii", $searchParam, $searchParam, $offset, $limit);
@@ -46,8 +49,8 @@ function getTotalTransaksi($conn, $search = '') {
         SELECT COUNT(*) as total
         FROM transaksi t
         JOIN barang b ON t.id_barang = b.id
-        WHERE b.nama_barang LIKE ? OR t.jenis LIKE ?
-    ";
+        JOIN kondisi k ON t.id_kondisi = k.id_kondisi
+        WHERE b.nama_barang LIKE ? OR t.jenis LIKE ?";
     $stmt = $conn->prepare($query);
     $searchParam = "%$search%";
     $stmt->bind_param("ss", $searchParam, $searchParam);
@@ -59,115 +62,81 @@ function getTotalTransaksi($conn, $search = '') {
 // Handle search
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_SESSION['search'] = $search; // Simpan pencarian dalam session
+    $_SESSION['search'] = $search;
     header("Location: " . $_SERVER['PHP_SELF'] . "?page=1&limit=$limit");
     exit;
 } else {
-    // Ambil pencarian dari session jika ada
     $search = isset($_SESSION['search']) ? $_SESSION['search'] : '';
 }
 
+// Ambil data transaksi dan totalnya
 $result = getTransaksi($conn, $search, $offset, $limit);
 $totalTransaksi = getTotalTransaksi($conn, $search);
 
-// Pastikan totalTransaksi tidak nol sebelum melakukan pembagian
-$totalPages = ($totalTransaksi > 0) ? ceil($totalTransaksi / $limit) : 1; // Setidaknya ada satu halaman
+// Hitung total halaman
+$totalPages = ($totalTransaksi > 0) ? ceil($totalTransaksi / $limit) : 1;
 
 // Menyiapkan variabel untuk layout
 $title = "Daftar Transaksi";
 $content = '
     <h1 class="mb-4">Daftar Transaksi</h1>
     <div class="d-flex justify-content-between">
-    <a href="tambah.php" class="btn btn-primary mb-3">Tambah Transaksi</a>
-    <form method="POST" class="d-flex mb-3" role="search">
-        <input type="search" name="search" class="form-control me-2" placeholder="Cari transaksi..." value="' . htmlspecialchars($search) . '">
-        <button class="btn btn-outline-success me-2" type="submit"><i class="bi bi-search"></i></button>
-        <a href="?reset=true&page=1&limit=' . $limit . '" class="btn btn-outline-warning"><i class="bi bi-arrow-clockwise"></i></a>
-    </form>
-';
-
-// Menambahkan tombol Laporan hanya untuk admin 
-if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSION['role'] === 'user') {
-    $content .= '<div class="mb-3">
-    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#dateModal">
-        <i class="bi bi-floppy me-2"></i>Laporan Transaksi
-    </button>
-</div>
-</div>';
-}
-
-// Modal untuk memilih tanggal
-$content .= '
-    <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="dateModalLabel">Pilih Tanggal untuk Laporan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="GET" action="../laporan/laporan_transaksi.php" target="_blank">
-                        <div class="mb-3">
-                            <label for="start_date" class="form-label">Dari Tanggal:</label>
-                            <input type="date" name="start_date" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="end_date" class="form-label">Sampai Tanggal:</label>
-                            <input type="date" name="end_date" class="form-control" required>
-                        </div>
-                        <input type="hidden" name="search" value="' . htmlspecialchars($search) . '">
-                        <button type="submit" class="btn btn-primary">Buat Laporan</button>
-                    </form>
-                </div>
-            </div>
+        <a href="tambah.php" class="btn btn-primary mb-3">Tambah Transaksi</a>
+        <form method="POST" class="d-flex mb-3" role="search">
+            <input type="search" name="search" class="form-control me-2" placeholder="Cari transaksi..." value="' . htmlspecialchars($search) . '">
+            <button class="btn btn-outline-success me-2" type="submit"><i class="bi bi-search"></i></button>
+            <a href="?reset=true&page=1&limit=' . $limit . '" class="btn btn-outline-warning"><i class="bi bi-arrow-clockwise"></i></a>
+        </form>';
+        // Menambahkan tombol Laporan
+        if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSION['role'] === 'user') {
+            $content .= '<div class="mb-3">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#dateModal">
+                <i class="bi bi-floppy me-2"></i>Laporan Transaksi
+            </button>
         </div>
-    </div>';
-
+        </div>';
+        }
 $content .= '
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead class="table-dark">
                 <tr>
-                    <th>No </th>
+                    <th>No</th>
                     <th>ID</th>
-                    <th>Nama Barang</th>
+                    <th>Nama Item</th>
                     <th>Jenis</th>
                     <th>Jumlah</th>
+                    <th>Kondisi</th>
+                    <th>No Surat Jalan</th>
                     <th>Tanggal</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>';
 
-            $no = 1; // Inisialisasi nomor urut
-            while ($row = $result->fetch_assoc()) {
-                $content .= '
-                <tr>
-                    <td>' . $no++ . '</td>
-                    <td>' . $row['id'] . '</td>
-                    <td>' . htmlspecialchars($row['nama_barang']) . '</td>
-                    <td>' . htmlspecialchars($row['jenis']) . '</td>
-                    <td>' . $row['jumlah'] . '</td>
-                    <td>' . date('d-m-Y H:i:s', strtotime($row['tanggal'])) . '</td>';
-                    
-                // Tampilkan kolom aksi hanya untuk Admin dan Manajer
-                if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager') {
-                    $content .= '<td>
-                        <a href="edit.php?id=' . $row['id'] . '" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="hapus.php?id=' . $row['id'] . '" class="btn btn-danger btn-sm">Hapus</a>
-                    </td>';
-                } else {
-                    $content .= '<td></td>'; // Kosongkan kolom aksi untuk pengguna lain
-                }
-
-                $content .= '</tr>';
-            }
+$no = $offset + 1;
+while ($row = $result->fetch_assoc()) {
+    $content .= '
+        <tr>
+            <td>' . $no++ . '</td>
+            <td>' . $row['id'] . '</td>
+            <td>' . htmlspecialchars($row['nama_barang']) . '</td>
+            <td>' . htmlspecialchars($row['jenis']) . '</td>
+            <td>' . $row['jumlah'] . '</td>
+            <td>' . htmlspecialchars($row['kondisi']) . '</td>
+            <td>' . htmlspecialchars($row['nomer_surat_jalan']) . '</td>
+            <td>' . date('d-m-Y', strtotime($row['tanggal'])) . '</td>
+            <td>
+                <a href="edit.php?id=' . $row['id'] . '" class="btn btn-warning btn-sm">Edit</a>
+                <a href="hapus.php?id=' . $row['id'] . '" class="btn btn-danger btn-sm">Hapus</a>
+            </td>
+        </tr>';
+}
 
 $content .= '
             </tbody>
         </table>
-    </div>
-';
+    </div>';
 
 // Pagination controls
 $content .= '<div class="d-flex justify-content-between align-items-center mb-3">

@@ -14,13 +14,6 @@ while ($row = $kategori_query->fetch_assoc()) {
     $kategori_options .= '<option value="' . $row['id_kategori'] . '">' . htmlspecialchars($row['kategori']) . '</option>';
 }
 
-// Ambil data kondisi
-$kondisi_query = $conn->query("SELECT * FROM kondisi");
-$kondisi_options = '';
-while ($row = $kondisi_query->fetch_assoc()) {
-    $kondisi_options .= '<option value="' . $row['id_kondisi'] . '">' . htmlspecialchars($row['kondisi']) . '</option>';
-}
-
 // Ambil data ruang
 $ruang_query = $conn->query("SELECT * FROM ruang");
 $ruang_options = '';
@@ -29,14 +22,14 @@ while ($row = $ruang_query->fetch_assoc()) {
 }
 
 // Set title dan content untuk layout
-$title = "Tambah Barang";
+$title = "Tambah Item";
 $content = '
-    <h1 class="mb-4">Tambah Barang</h1>
+    <h1 class="mb-4">Tambah Item</h1>
     <form action="proses_tambah.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
         <div class="mb-3">
-            <label for="nama_barang" class="form-label">Nama Barang:</label>
+            <label for="nama_barang" class="form-label">Nama Item:</label>
             <input type="text" class="form-control" id="nama_barang" name="nama_barang" required>
-            <div class="invalid-feedback">Nama barang harus diisi.</div>
+            <div class="invalid-feedback">Nama item harus diisi.</div>
         </div>
         
         <div class="mb-3">
@@ -55,15 +48,6 @@ $content = '
         </div>
 
         <div class="mb-3">
-            <label for="id_kondisi" class="form-label">ID Kondisi:</label>
-            <select class="form-select" id="id_kondisi" name="id_kondisi" required>
-                <option value="">Pilih Kondisi</option>
-                ' . $kondisi_options . '
-            </select>
-            <div class="invalid-feedback">ID Kondisi harus diisi.</div>
-        </div>
-
-        <div class="mb-3">
             <label for="id_ruangan" class="form-label">ID Ruang:</label>
             <select class="form-select" id="id_ruangan" name="id_ruangan" required>
                 <option value="">Pilih Ruang</option>
@@ -79,21 +63,9 @@ $content = '
         </div>
         
         <div class="mb-3">
-            <label for="harga_satuan" class="form-label">Harga Satuan:</label>
-            <input type="number" class="form-control" id=" harga_satuan" name="harga_satuan" step="0.01" required>
-            <div class="invalid-feedback">Harga satuan harus diisi.</div>
-        </div>
-        
-        <div class="mb-3">
             <label for="asal_perolehan" class="form-label">Asal Perolehan:</label>
             <input type="text" class="form-control" id="asal_perolehan" name="asal_perolehan" required>
             <div class="invalid-feedback">Asal perolehan harus diisi.</div>
-        </div>
-        
-        <div class="mb-3">
-            <label for="gambar" class="form-label">Gambar:</label>
-            <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*" required>
-            <div class="invalid-feedback">Gambar harus diunggah.</div>
         </div>
 
         <button type="submit" class="btn btn-primary">Tambah</button>

@@ -25,21 +25,27 @@ if (isset($_GET['reset'])) {
     exit;
 }
 
-// Fungsi untuk mendapatkan daftar barang dengan pagination
-function getBarang($conn, $search = '', $offset = 0, $limit = 10) {
-    $query = "SELECT b.*, k.kategori, c.kondisi, r.ruangan 
+$filterKategori = '';
+
+// Modifikasi fungsi getBarang untuk menyertakan filter kategori
+function getBarang($conn, $search = '', $offset = 0, $limit = 10, $filterKategori = '') {
+    $query = "SELECT b.*, k.kategori, r.ruangan 
               FROM barang b
               LEFT JOIN kategori k ON b.id_kategori = k.id_kategori
-              LEFT JOIN kondisi c ON b.id_kondisi = c.id_kondisi
               LEFT JOIN ruang r ON b.id_ruangan = r.id_ruangan
-              WHERE 
-              b.nama_barang LIKE ? OR 
-              b.merk LIKE ? OR 
-              b.asal_perolehan LIKE ? 
-              ORDER BY b.created_at DESC LIMIT ?, ?";
+              WHERE (b.nama_barang LIKE ? OR b.merk LIKE ? OR b.asal_perolehan LIKE ?)";
+    if (!empty($filterKategori)) {
+        $query .= " AND b.id_kategori = ?";
+    }
+    $query .= " ORDER BY b.created_at DESC LIMIT ?, ?";
     $stmt = $conn->prepare($query);
+
     $searchParam = "%$search%";
-    $stmt->bind_param("ssiii", $searchParam, $searchParam, $searchParam, $offset, $limit);
+    if (!empty($filterKategori)) {
+        $stmt->bind_param("sssiii", $searchParam, $searchParam, $searchParam, $filterKategori, $offset, $limit);
+    } else {
+        $stmt->bind_param("ssiii", $searchParam, $searchParam, $searchParam, $offset, $limit);
+    }
     $stmt->execute();
     return $stmt->get_result();
 }
@@ -58,6 +64,19 @@ function getTotalBarang($conn, $search = '') {
     return $result->fetch_assoc()['total'];
 }
 
+// Ambil daftar kategori untuk dropdown
+function getKategori($conn) {
+    $query = "SELECT id_kategori, kategori FROM kategori";
+    $result = $conn->query($query);
+    $kategoriList = [];
+    while ($row = $result->fetch_assoc()) {
+        $kategoriList[] = $row;
+    }
+    return $kategoriList;
+}
+
+$kategoriList = getKategori($conn);
+
 // Handle search
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -69,7 +88,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $search = isset($_SESSION['search']) ? $_SESSION['search'] : '';
 }
 
-$result = getBarang($conn, $search, $offset, $limit);
+// Tangani filter kategori
+$filterKategori = isset($_GET['filter_kategori']) ? $_GET['filter_kategori'] : '';
+if (!empty($filterKategori)) {
+    $_SESSION['filter_kategori'] = $filterKategori; // Simpan filter kategori di session
+} elseif (isset($_GET['reset_filter'])) {
+    unset($_SESSION['filter_kategori']); // Hapus filter kategori
+    header("Location: " . $_SERVER['PHP_SELF'] . "?page=1&limit=$limit");
+    exit;
+} else {
+    $filterKategori = isset($_SESSION['filter_kategori']) ? $_SESSION['filter_kategori'] : '';
+}
+
+// Panggil fungsi getBarang dengan filter kategori
+$result = getBarang($conn, $search, $offset, $limit, $filterKategori);
 $totalBarang = getTotalBarang($conn, $search);
 
 // Pastikan totalBarang tidak nol sebelum melakukan pembagian
@@ -87,12 +119,9 @@ function createTableContent($result) {
             <td>' . htmlspecialchars($row['nama_barang']) . '</td>
             <td>' . htmlspecialchars($row ['merk']) . '</td>
             <td>' . htmlspecialchars($row['kategori']) . '</td>
-            <td>' . htmlspecialchars($row['kondisi']) . '</td>
             <td>' . htmlspecialchars($row['ruangan']) . '</td>
             <td>' . $row['stok'] . '</td>
-            <td>' . number_format($row['harga_satuan'], 2, ',', '.') . '</td>
             <td>' . htmlspecialchars($row['asal_perolehan']) . '</td>
-            <td><img src="/inventory-app/modules/uploads/' . htmlspecialchars($row['gambar']) . '" alt="Gambar" style="width: 50px; height: auto;"></td>
             <td>' . date('d-m-Y H:i:s', strtotime($row['created_at'])) . '</td>
             <td>' . date('d-m-Y H:i:s', strtotime($row['updated_at'])) . '</td>';
 
@@ -113,23 +142,23 @@ function createTableContent($result) {
 }
 
 $content = '
-    <h1 class="mb-4">Daftar Barang</h1>
+    <h1 class="mb-4">Daftar Item</h1>
     <div class="d-flex justify-content-between">
-    <a href="tambah.php" class="btn btn-primary mb-3">Tambah Barang</a>
+    <a href="tambah.php" class="btn btn-primary mb-3">Tambah Item</a>
     <form method="POST" class="d-flex mb-3" role="search">
-        <input type="search" name="search" class="form-control me-2" placeholder="Cari barang..." value="' . htmlspecialchars($search) . '">
+        <input type="search" name="search" class="form-control me-2" placeholder="Cari Item..." value="' . htmlspecialchars($search) . '">
         <button class="btn btn-outline-success me-2" type="submit"><i class="bi bi-search"></i></button>
         <a href="?reset=true&page=1&limit=' . $limit . '" class="btn btn-outline-warning"><i class="bi bi-arrow-clockwise"></i></a>
     </form>
 ';
 
-// Menambahkan dropdown laporan hanya untuk admin 
+// Menambahkan dropdown laporan
 if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSION['role'] === 'user') {
     $content .= '
     <div class="mb-3">
         <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-floppy me-2"></i>Laporan Barang
+                <i class="bi bi-floppy me-2"></i>Laporan Item
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#createdDateModal">Tanggal Dibuat</a></li>
@@ -139,6 +168,23 @@ if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSIO
     </div>
     </div>';
 }
+
+// Tambahkan form filter di tampilan
+$content .= '
+    <div class="mb-3">
+        <form method="GET" class="d-flex align-items-center" role="filter">
+            <label for="filter_kategori" class="form-label me-2">Filter Kategori:</label>
+            <select name="filter_kategori" id="filter_kategori" class="form-select me-2">
+                <option value="">Semua Kategori</option>';
+foreach ($kategoriList as $kategori) {
+    $selected = ($filterKategori == $kategori['id_kategori']) ? 'selected' : '';
+    $content .= '<option value="' . $kategori['id_kategori'] . '" ' . $selected . '>' . htmlspecialchars($kategori['kategori']) . '</option>';
+}
+$content .= '</select>
+            <button type="submit" class="btn btn-outline-primary me-2">Filter</button>
+            <a href="?reset_filter=true&page=1&limit=' . $limit . '" class="btn btn-outline-warning">Reset</a>
+        </form>
+    </div>';
 
 // Modal untuk memilih tanggal dibuat
 $content .= '
@@ -203,15 +249,12 @@ $content .= '
                 <tr>
                     <th>No</th>
                     <th>ID</th>
-                    <th>Nama Barang</th>
+                    <th>Nama Item</th>
                     <th>Merk</th>
                     <th>Kategori</th>
-                    <th>Kondisi</th>
                     <th>Ruang</th>
                     <th>Stok</th>
-                    <th>Harga Satuan</th>
                     <th>Asal Perolehan</th>
-                    <th>Gambar</th>
                     <th>Tanggal Dibuat</th>
                     <th>Tanggal Diupdate</th>
                     <th>Aksi</th>
@@ -264,7 +307,7 @@ function changeLimit(value) {
 }
 </script>';
 
-$title = "Daftar Barang";
+$title = "Daftar Item";
 // Menyertakan layout
 include '../../views/layout.php';
 ?>

@@ -8,9 +8,12 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin' && $_SESSION[
 include '../../config/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Validasi input
     $id_barang = intval($_POST['id_barang']);
     $jenis = htmlspecialchars($_POST['jenis']);
     $jumlah = intval($_POST['jumlah']);
+    $id_kondisi = intval($_POST['id_kondisi']); // Ubah menjadi integer
+    $nomer_surat_jalan = htmlspecialchars(trim($_POST['nomer_surat_jalan']));
     $tanggal = htmlspecialchars($_POST['tanggal']); // Format datetime-local
 
     // Validasi input jumlah
@@ -56,8 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $query_update_stok->execute();
 
         // Tambahkan transaksi ke tabel transaksi
-        $query_tambah_transaksi = $conn->prepare("INSERT INTO transaksi (id_barang, jenis, jumlah, tanggal) VALUES (?, ?, ?, ?)");
-        $query_tambah_transaksi->bind_param("isis", $id_barang, $jenis, $jumlah, $tanggal);
+        $query_tambah_transaksi = $conn->prepare("
+            INSERT INTO transaksi (id_barang, jenis, jumlah, id_kondisi, nomer_surat_jalan, tanggal) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $query_tambah_transaksi->bind_param("isiiss", $id_barang, $jenis, $jumlah, $id_kondisi, $nomer_surat_jalan, $tanggal);
         $query_tambah_transaksi->execute();
 
         // Commit transaksi

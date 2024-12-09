@@ -70,7 +70,7 @@ $html .= '<table border="1" cellpadding="5">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nama Barang</th>
+                    <th>Nama Item</th>
                     <th>Jenis</th>
                     <th>Jumlah</th>
                     <th>Tanggal</th>

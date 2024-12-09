@@ -14,7 +14,7 @@
       <li>
         <a href="/inventory-app/modules/barang" class="nav-link text-white d-flex align-items-center">
           <i class="bi bi-database me-2 fs-4"></i>
-          <p class="m-0 p-0" id="ts">Barang</p>
+          <p class="m-0 p-0" id="ts">Item</p>
         </a>
       </li>
       <li>

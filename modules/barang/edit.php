@@ -23,15 +23,6 @@ while ($row = $kategori_query->fetch_assoc()) {
     $kategori_options .= '<option value="' . $row['id_kategori'] . '" ' . $selected . '>' . htmlspecialchars($row['kategori']) . '</option>';
 }
 
-// Ambil data kondisi
-$kondisi_query = $conn->query("SELECT * FROM kondisi");
-$kondisi_options = '';
-while ($row = $kondisi_query->fetch_assoc()) {
-    // Tandai opsi yang sesuai dengan id_kondisi dari barang
-    $selected = ($row['id_kondisi'] == $barang['id_kondisi']) ? 'selected' : '';
-    $kondisi_options .= '<option value="' . $row['id_kondisi'] . '" ' . $selected . '>' . htmlspecialchars($row['kondisi']) . '</option>';
-}
-
 // Ambil data ruang
 $ruang_query = $conn->query("SELECT * FROM ruang");
 $ruang_options = '';
@@ -42,16 +33,16 @@ while ($row = $ruang_query->fetch_assoc()) {
 }
 
 // Set title dan content untuk layout
-$title = "Edit Barang";
+$title = "Edit Item";
 $content = '
-    <h1 class="mb-4">Edit Barang</h1>
+    <h1 class="mb-4">Edit Item</h1>
     <form action="proses_edit.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="id" value="' . $barang['id'] . '">
         
         <div class="mb-3">
-            <label for="nama_barang" class="form-label">Nama Barang:</label>
+            <label for="nama_barang" class="form-label">Nama Item:</label>
             <input type="text" class="form-control" id="nama_barang" name="nama_barang" value="' . htmlspecialchars($barang['nama_barang']) . '" required>
-            <div class="invalid-feedback">Nama barang harus diisi.</div>
+            <div class="invalid-feedback">Nama item harus diisi.</div>
         </div>
         
         <div class="mb-3">
@@ -70,15 +61,6 @@ $content = '
         </div>
 
         <div class="mb-3">
-            <label for="id_kondisi" class="form-label">ID Kondisi:</label>
-            <select class="form-select" id="id_kondisi" name="id_kondisi" required>
-                <option value="">Pilih Kondisi</option>
-                ' . $kondisi_options . '
-            </select>
-            <div class="invalid-feedback">ID Kondisi harus diisi.</div>
-        </div>
-
-        <div class="mb-3">
             <label for="id_ruangan" class="form-label">ID Ruangan:</label>
             <select class ="form-select" id="id_ruangan" name="id_ruangan" required>
                 <option value="">Pilih Ruang</option>
@@ -92,32 +74,13 @@ $content = '
             <input type="number" class="form-control" id="stok" name="stok" value="' . $barang['stok'] . '" required>
             <div class="invalid-feedback">Stok harus diisi.</div>
         </div>
-        
-        <div class="mb-3">
-            <label for="harga_satuan" class="form-label">Harga Satuan:</label>
-            <input type="number" class="form-control" id="harga_satuan" name="harga_satuan" step="0.01" value="' . $barang['harga_satuan'] . '" required>
-            <div class="invalid-feedback">Harga satuan harus diisi.</div>
-        </div>
-        
+
         <div class="mb-3">
             <label for="asal_perolehan" class="form-label">Asal Perolehan:</label>
             <input type="text" class="form-control" id="asal_perolehan" name="asal_perolehan" value="' . htmlspecialchars($barang['asal_perolehan']) . '" required>
             <div class="invalid-feedback">Asal perolehan harus diisi.</div>
         </div>
 
-        <div class="mb-3">
-            <label for="gambar" class="form-label">Gambar: </label>
-            <div>';
-            if (!empty($barang['gambar'])) {
-                $content .= '<img src="../uploads/' . htmlspecialchars($barang['gambar']) . '" alt="Gambar" style="width: 100px; height: auto; display: block; margin-bottom: 10px;">';
-            } else {
-                $content .= 'Tidak ada gambar saat ini.';
-            }
-            $content .= '</div>
-            <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*">
-            <div class="invalid-feedback">Silakan pilih gambar jika ingin mengunggahnya.</div>
-        </div>
-        
         <button type="submit" class="btn btn-primary">Simpan</button>
         <a href="index.php" class="btn btn-secondary">Kembali</a>
     </form>
