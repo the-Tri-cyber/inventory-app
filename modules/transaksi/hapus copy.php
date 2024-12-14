@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'manager') {
+if (!isset($_SESSION['username']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'manager')) {
     header("Location: ../auth/login.php");
     exit;
 }
@@ -75,9 +75,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
-
-// Set title dan content untuk layout
-$title = "Hapus Transaksi"; 
-
-include '../../views/layout.php';
 ?>

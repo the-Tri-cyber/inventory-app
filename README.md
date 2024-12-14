@@ -14,18 +14,20 @@ Sebelum memulai, pastikan Anda memiliki perangkat lunak berikut terinstal:
 
 Ikuti langkah-langkah berikut untuk mengatur dan menjalankan aplikasi:
 
-1. Clone repository ini menggunakan perintah berikut:
-2. `git clone https://github.com/the-tri-cyber/inventory-app.git`
-3. Buka folder repository yang telah di clone menggunakan perintah berikut:
-4. `cd inventory-app`
-5. Install tcpdf library menggunakan perintah berikut:
-6. `composer require tecnickcom/tcpdf`
-7. jalankan mysql dan apache server
-8. buat database baru dengan nama inventory
-9. import database inventory.sql ke dalam database inventory
-10. jalankan aplikasi menggunakan perintah berikut:
-11. `localhost/inventory-app/`
-12. login menggunakan email dan password dibawah.
+Clone repository ini menggunakan perintah berikut:
+`git clone https://github.com/the-tri-cyber/inventory-app.git`
+Buka folder repository yang telah di clone menggunakan perintah berikut:
+`cd inventory-app`
+Install tcpdf library menggunakan perintah berikut:
+`composer require tecnickcom/tcpdf` (extension zip pada php harus aktif, dengan menghilangkan tanda ";")
+Install phpspreadsheet library menggunakan perintah berikut:
+`composer require phpoffice/phpspreadsheet` (extension gd pada php harus aktif, dengan menghilangkan tanda ";")
+jalankan mysql dan apache server
+buat database baru dengan nama inventory
+import database inventory.sql ke dalam database inventory
+jalankan aplikasi menggunakan perintah berikut:
+`localhost/inventory-app/`
+login menggunakan email dan password dibawah.
 
 note: jangan ubah nama folder `inventory-app` karena akan menyebabkan aplikasi tidak dapat berjalan dengan benar. Jika ingin mengubah nama folder, pastikan untuk mengubah nama folder di dalam file `config.php` dan mengubah nama folder di dalam file `index.php` juga. serta path yang berkaitan dengan nama folder tersebut.
 

@@ -7,7 +7,7 @@ if (!isset($_SESSION['username'])) {
 
 // Cek peran pengguna
 if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'manager') {
-    header("Location: /inventory-app/public/"); // Ganti dengan URL halaman yang diinginkan
+    header("Location: /inventory-app/"); // Ganti dengan URL halaman yang diinginkan
     exit();
 }
 

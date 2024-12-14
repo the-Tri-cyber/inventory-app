@@ -7,8 +7,8 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-if (!in_array($_SESSION['role'], ['admin', 'manager'])) {
-    header("Location: /inventory-app/modules/transaksi/user_transaksi.php");
+if (!in_array($_SESSION['role'], ['admin', 'manager', 'user'])) {
+    header("Location: /inventory-app/");
     exit();
 }
 
@@ -80,42 +80,26 @@ $totalPages = ($totalTransaksi > 0) ? ceil($totalTransaksi / $limit) : 1;
 $title = "Daftar Transaksi";
 $content = '
     <h1 class="mb-4">Daftar Transaksi</h1>
-    <div class="d-flex justify-content-between">
-        <div class="mb-3">
-        <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-floppy me-2"></i>Tambah Transaksi
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <li><a class="dropdown-item" href="tambah.php">Tambah Manual</a></li>
-                <li><a class="dropdown-item" href="tambah_file.php">Tambah Melalui File</a></li>
-            </ul>
-        </div>
-        </div>
-        <form method="POST" class="d-flex mb-3" role="search">
-            <input type="search" name="search" class="form-control me-2" placeholder="Cari transaksi..." value="' . htmlspecialchars($search) . '">
-            <button class="btn btn-outline-success me-2" type="submit"><i class="bi bi-search"></i></button>
-            <a href="?reset=true&page=1&limit=' . $limit . '" class="btn btn-outline-warning"><i class="bi bi-arrow-clockwise"></i></a>
-        </form>';
-
-        // Menambahkan tombol Laporan
-        if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSION['role'] === 'user') {
-            $content .= '<div class="mb-3">
+    <div class="row">
+        <div class="col-3 mb-3">
             <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#dateModal">
                 <i class="bi bi-floppy me-2"></i>Laporan Transaksi
             </button>
         </div>
-        </div>';
-        }
-
-$content .= '<form id="multiDeleteForm" method="POST" action="hapus.php">';
+        <div class="col-9">
+            <form method="POST" class="d-flex mb-3" role="search">
+                <input type="search" name="search" class="form-control me-2" placeholder="Cari transaksi..." value="' . htmlspecialchars($search) . '">
+                <button class="btn btn-outline-success me-2" type="submit"><i class="bi bi-search"></i></button>
+                <a href="?reset=true&page=1&limit=' . $limit . '" class="btn btn-outline-warning"><i class="bi bi-arrow-clockwise"></i></a>
+            </form>
+        </div>
+    </div>';
 
 $content .= '
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead class="table-dark">
                 <tr>
-                    <th><input type="checkbox" id="selectAll"></th>
                     <th>No</th>
                     <th>ID</th>
                     <th>Nama Item</th>
@@ -124,7 +108,6 @@ $content .= '
                     <th>Kondisi</th>
                     <th>No Surat Jalan</th>
                     <th>Tanggal</th>
-                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>';
@@ -133,7 +116,6 @@ $no = $offset + 1;
 while ($row = $result->fetch_assoc()) {
     $content .= '
         <tr>
-            <td><input type="checkbox" name="selected_ids[]" value="' . $row['id'] . '"></td>
             <td>' . $no++ . '</td>
             <td>' . $row['id'] . '</td>
             <td>' . htmlspecialchars($row['nama_barang']) . '</td>
@@ -142,17 +124,6 @@ while ($row = $result->fetch_assoc()) {
             <td>' . htmlspecialchars($row['kondisi']) . '</td>
             <td>' . htmlspecialchars($row['nomer_surat_jalan']) . '</td>
             <td>' . date('d-m-Y H:i:s', strtotime($row['tanggal'])) . '</td>';
-
-            // Tampilkan kolom aksi hanya untuk Admin dan Manajer 
-            if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager') {
-                $content .= '<td>
-                <a href="edit.php?id=' . $row['id'] . '" class="btn btn-warning btn-sm">Edit</a>
-                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#hapusModal" data-id="' . $row['id'] . '" onclick="setHapusId(this)">Hapus</button>
-                </td>';
-            } else {
-                $content .= '<td></td>'; // Kosongkan kolom aksi untuk pengguna lain
-            }
-
                     $content .= '</tr>';
             }
 
@@ -161,11 +132,6 @@ $content .= '
         </table>
     </div>';
 
-$content .= '<button type="button" class="btn btn-danger d-none" id="deleteSelected" data-bs-toggle="modal" data-bs-target="#hapusModal">
-    Hapus Terpilih
-</button>';
-
-$content .= '</form>';
 
 // Pagination controls
 $content .= '<div class="d-flex justify-content-between align-items-center mb-3">
@@ -226,30 +192,6 @@ $content .= '
     </div>
 </div>';
 
-// Modal konfirmasi hapus
-$content .= '
-<div class="modal fade" id="hapusModal" tabindex="-1" aria-labelledby="hapusModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="hapusModalLabel">Konfirmasi Hapus</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus transaksi ini?</p>
-                <p id="hapusCount"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <form id="deleteForm" method="POST" action="hapus.php">
-                    <input type="hidden" name="hapus_ids" id="hapus_ids">
-                    <button type="submit" class="btn btn-danger">Hapus</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>';
-
 // Modal untuk menampilkan pesan
 $content .= '
 <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
@@ -281,52 +223,12 @@ if (isset($_GET['message'])) {
 
 $content .= '
 <script>
-document.getElementById("selectAll").addEventListener("click", function(e) {
-    var checkboxes = document.querySelectorAll("input[type=\'checkbox\']");
-    checkboxes.forEach(cb => cb.checked = e.target.checked);
-    toggleDeleteButton();
-});
-
-document.querySelectorAll("input[name=\'selected_ids[]\']").forEach(cb => {
-    cb.addEventListener("change", toggleDeleteButton);
-});
-
-document.getElementById("deleteSelected").addEventListener("click", function() {
-    var checkboxes = document.querySelectorAll("input[name=\'selected_ids[]\']:checked");
-    var selectedCount = checkboxes.length;
-    if (selectedCount > 0) {
-        document.getElementById("hapusCount").innerText = "Jumlah yang dipilih: " + selectedCount;
-        var ids = Array.from(checkboxes).map(cb => cb.value).join(",");
-        document.getElementById("hapus_ids").value = ids;
-        $("#hapusModal").modal("show");
-    } else {
-        alert("Pilih setidaknya satu transaksi untuk dihapus.");
-    }
-});
-
-function setHapusId(button) {
-    var id = button.getAttribute("data-id"); // Ambil ID dari atribut data-id
-    document.getElementById("hapus_ids").value = id; // Set ID ke input tersembunyi
-    document.getElementById("hapusCount").innerText = "Anda akan menghapus transaksi dengan ID: " + id; // Tampilkan ID di modal
-}
-
 function changeLimit(value) {
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set("limit", value);
     urlParams.set("page", 1); // Reset to first page
     window.location.search = urlParams.toString();
     window.location = "?page=1&limit=" + value;
-}
-
-// Fungsi untuk menampilkan tombol Hapus Terpilih jika ada yang tercentang
-function toggleDeleteButton() {
-    var checkboxes = document.querySelectorAll("input[name=\'selected_ids[]\']:checked");
-    var deleteButton = document.getElementById("deleteSelected");
-    if (checkboxes.length > 0) {
-        deleteButton.classList.remove("d-none");
-    } else {
-        deleteButton.classList.add("d-none");
-    }
 }
 
 // Script untuk menampilkan modal pesan

@@ -6,8 +6,8 @@ if (!isset($_SESSION['username'])) {
 }
 
 // Cek peran pengguna
-if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'manager') {
-    header("Location: /inventory-app/modules/barang/user_barang.php");
+if ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'manager' && $_SESSION['role'] !== 'user') {
+    header("Location: /inventory-app/");
     exit();
 }
 
@@ -125,16 +125,6 @@ function createTableContent($result) {
             <td>' . date('d-m-Y H:i:s', strtotime($row['created_at'])) . '</td>
             <td>' . date('d-m-Y H:i:s', strtotime($row['updated_at'])) . '</td>';
 
-        // Tampilkan kolom aksi hanya untuk Admin dan Manajer
-        if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager') {
-            $content .= '<td>
-                <a href="edit.php?id=' . $row['id'] . '" class="btn btn-warning btn-sm">Edit</a>
-                <a href="hapus.php?id=' . $row['id'] . '" class="btn btn-danger btn-sm">Hapus</a>
-            </td>';
-        } else {
-            $content .= '<td></td>'; // Kosongkan kolom aksi untuk pengguna lain
-        }
-
         $content .= '</tr>';
     }
 
@@ -143,20 +133,8 @@ function createTableContent($result) {
 
 $content = '
     <h1 class="mb-4">Daftar Item</h1>
-    <div class="d-flex justify-content-between">
-    <a href="tambah.php" class="btn btn-primary mb-3">Tambah Item</a>
-    <form method="POST" class="d-flex mb-3" role="search">
-        <input type="search" name="search" class="form-control me-2" placeholder="Cari Item..." value="' . htmlspecialchars($search) . '">
-        <button class="btn btn-outline-success me-2" type="submit"><i class="bi bi-search"></i></button>
-        <a href="?reset=true&page=1&limit=' . $limit . '" class="btn btn-outline-warning"><i class="bi bi-arrow-clockwise"></i></a>
-    </form>
-';
-
-// Menambahkan dropdown laporan
-if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSION['role'] === 'user') {
-    $content .= '
-    <div class="mb-3">
-        <div class="dropdown">
+    <div class="row g-3">
+        <div class="dropdown col-3">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-floppy me-2"></i>Laporan Item
             </button>
@@ -165,9 +143,14 @@ if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSIO
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#updatedDateModal">Tanggal Diupdate</a></li>
             </ul>
         </div>
-    </div>
+        <div class="col-9">
+            <form method="POST" class="d-flex mb-3" role="search">
+                <input type="search" name="search" class="form-control me-2" placeholder="Cari transaksi..." value="' . htmlspecialchars($search) . '">
+                <button class="btn btn-outline-success me-2" type="submit"><i class="bi bi-search"></i></button>
+                <a href="?reset=true&page=1&limit=' . $limit . '" class="btn btn-outline-warning"><i class="bi bi-arrow-clockwise"></i></a>
+            </form>
+        </div>
     </div>';
-}
 
 // Tambahkan form filter di tampilan
 $content .= '
@@ -257,7 +240,6 @@ $content .= '
                     <th>Asal Perolehan</th>
                     <th>Tanggal Dibuat</th>
                     <th>Tanggal Diupdate</th>
-                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>' . createTableContent($result) . '</tbody>

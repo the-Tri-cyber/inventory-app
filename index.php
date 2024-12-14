@@ -92,9 +92,6 @@ ob_start(); // Mulai output buffering
                 <th>Jenis</th>
                 <th>Jumlah</th>
                 <th>Tanggal</th>
-                <?php if ($_SESSION['role'] === 'admin'): ?>
-                    <th>Aksi</th>
-                <?php endif; ?>
             </tr>
         </thead>
         <tbody>
@@ -118,12 +115,6 @@ ob_start(); // Mulai output buffering
                         <td>{$row['jenis']}</td>
                         <td>{$row['jumlah']}</td>
                         <td>" . date('d-m-Y', strtotime($row['tanggal'])) . "</td>";
-                    if ($_SESSION['role'] === 'admin') {
-                        echo "<td>
-                            <a href='/inventory-app/modules/transaksi/edit.php?id={$row['id']}' class='btn btn-warning btn-sm'>Edit</a>
-                            <a href='/inventory-app/modules/transaksi/hapus.php?id={$row['id']}' class='btn btn-danger btn-sm'>Hapus</a>
-                        </td>";
-                    }
                     echo "</tr>";
                     $no++;
                 }
