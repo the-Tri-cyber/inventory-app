@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2024 at 07:25 AM
+-- Generation Time: Dec 14, 2024 at 01:44 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,13 +44,13 @@ CREATE TABLE `barang` (
 --
 
 INSERT INTO `barang` (`id`, `nama_barang`, `merk`, `id_kategori`, `id_ruangan`, `stok`, `asal_perolehan`, `created_at`, `updated_at`) VALUES
-(5, 'mouse', 'r-one', 1, 1, 0, 'pt indobismar', '2024-11-21 10:42:31', '2024-12-09 06:13:56'),
-(6, 'wifi adapter', 'd-link', 1, 1, 20, 'pt indobismar', '2024-11-21 10:43:08', '2024-12-08 13:00:51'),
-(7, 'handphone', 'iphone 14 pro max', 1, 2, 20, 'pt indobismar', '2024-11-22 10:02:32', '2024-12-08 13:00:42'),
-(8, 'kipas angin', 'nova', 1, 3, 20, 'instansi komdigi', '2024-11-23 13:11:50', '2024-12-08 13:00:35'),
-(9, 'obeng', 'visipro', 4, 3, 20, 'axioo', '2024-11-24 02:36:59', '2024-12-08 13:00:15'),
-(14, 'bola basket', 'molten', 2, 2, 20, 'instansi komdigi', '2024-11-24 13:56:09', '2024-12-08 13:00:27'),
-(15, 'jam tangan', 'rolex', 1, 3, 20, 'pt di belanda', '2024-12-08 13:54:10', '2024-12-08 14:03:31');
+(5, 'mouse', 'r-one', 1, 1, 20, 'pt indobismar', '2024-11-21 10:42:31', '2024-12-14 08:47:06'),
+(6, 'wifi adapter', 'd-link', 1, 1, 20, 'pt indobismar', '2024-11-21 10:43:08', '2024-12-14 07:58:40'),
+(7, 'handphone', 'iphone 14 pro max', 1, 2, 20, 'pt indobismar', '2024-11-22 10:02:32', '2024-12-14 11:30:58'),
+(8, 'kipas angin', 'nova', 1, 3, 20, 'instansi komdigi', '2024-11-23 13:11:50', '2024-12-14 11:31:12'),
+(9, 'obeng', 'visipro', 4, 3, 20, 'axioo', '2024-11-24 02:36:59', '2024-12-14 07:58:33'),
+(14, 'bola basket', 'molten', 2, 2, 30, 'instansi komdigi', '2024-11-24 13:56:09', '2024-12-14 11:30:58'),
+(15, 'jam tangan', 'rolex', 1, 3, 20, 'pt di belanda', '2024-12-08 13:54:10', '2024-12-14 07:58:26');
 
 -- --------------------------------------------------------
 
@@ -133,10 +133,7 @@ CREATE TABLE `transaksi` (
 --
 
 INSERT INTO `transaksi` (`id`, `id_barang`, `jenis`, `jumlah`, `id_kondisi`, `nomer_surat_jalan`, `tanggal`) VALUES
-(7, 5, 'keluar', 5, 1, 'miso1983829923', '2024-12-08 13:12:00'),
-(8, 5, 'keluar', 15, 2, 'iosn320985829050', '2024-12-08 13:42:00'),
-(13, 5, 'masuk', 5, 1, 'iosn2032099433435', '2024-12-09 06:13:00'),
-(14, 5, 'keluar', 5, 2, 'iosn2032099433435', '2024-12-09 06:14:00');
+(175, 14, 'masuk', 10, 1, 'FSP 2403434', '2024-12-14 13:39:00');
 
 -- --------------------------------------------------------
 
@@ -236,7 +233,7 @@ ALTER TABLE `ruang`
 -- AUTO_INCREMENT for table `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=178;
 
 --
 -- AUTO_INCREMENT for table `users`
